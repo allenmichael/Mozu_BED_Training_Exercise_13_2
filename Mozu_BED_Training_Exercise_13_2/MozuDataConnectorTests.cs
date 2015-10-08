@@ -40,32 +40,42 @@ namespace Mozu_BED_Training_Exercise_13_2
             System.Diagnostics.Debug.WriteLine("Account Email[{0}]: {1}", account.Id, account.EmailAddress);
 
             //You can also filter the Accounts Get call by email
-            var accountByEmail = customerAccountResource.GetAccountsAsync(filter: "EmailAddress eq 'test@customer.com'").Result;
+            var accountByEmail = customerAccountResource.GetAccountsAsync(filter: "EmailAddress eq 'am_fake_email@whatafakeemail.com'").Result;
 
             //write account email
             System.Diagnostics.Debug.WriteLine("Account Email[{0}]: {1}", account.EmailAddress, account.Id);
 
             //Now, create a Customer Contact resource
             var customerContactResource = new Mozu.Api.Resources.Commerce.Customer.Accounts.CustomerContactResource(_apiContext);
-
-            var customerContactCollection = customerContactResource.GetAccountContactsAsync(accountByEmail.Items[0].Id).Result;
-
-            foreach(var contact in customerContactCollection.Items)
+            var customerContactCollection = new Mozu.Api.Contracts.Customer.CustomerContactCollection();
+            if (accountByEmail.TotalCount > 0)
             {
-                System.Diagnostics.Debug.WriteLine("Name:");
-                System.Diagnostics.Debug.WriteLine(contact.FirstName);
-                System.Diagnostics.Debug.WriteLine(contact.MiddleNameOrInitial);
-                System.Diagnostics.Debug.WriteLine(contact.LastNameOrSurname);
-                System.Diagnostics.Debug.WriteLine("Address:");
-                System.Diagnostics.Debug.WriteLine(contact.Address.Address1);
-                System.Diagnostics.Debug.WriteLine(contact.Address.Address2);
-                System.Diagnostics.Debug.WriteLine(contact.Address.Address3);
-                System.Diagnostics.Debug.WriteLine(contact.Address.Address4);
-                System.Diagnostics.Debug.WriteLine(contact.Address.CityOrTown);
-                System.Diagnostics.Debug.WriteLine(contact.Address.StateOrProvince);
-                System.Diagnostics.Debug.WriteLine(contact.Address.PostalOrZipCode);
-                System.Diagnostics.Debug.WriteLine(contact.Address.CountryCode);
-                System.Diagnostics.Debug.WriteLine(String.Format("Is a validated address? {0}", contact.Address.IsValidated));
+                customerContactCollection = customerContactResource.GetAccountContactsAsync(accountByEmail.Items[0].Id).Result;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("No contact information -- Customer does not exist");
+            }
+
+            if (customerContactCollection.TotalCount > 0)
+            {
+                foreach (var contact in customerContactCollection.Items)
+                {
+                    System.Diagnostics.Debug.WriteLine("Name:");
+                    System.Diagnostics.Debug.WriteLine(contact.FirstName);
+                    System.Diagnostics.Debug.WriteLine(contact.MiddleNameOrInitial);
+                    System.Diagnostics.Debug.WriteLine(contact.LastNameOrSurname);
+                    System.Diagnostics.Debug.WriteLine("Address:");
+                    System.Diagnostics.Debug.WriteLine(contact.Address.Address1);
+                    System.Diagnostics.Debug.WriteLine(contact.Address.Address2);
+                    System.Diagnostics.Debug.WriteLine(contact.Address.Address3);
+                    System.Diagnostics.Debug.WriteLine(contact.Address.Address4);
+                    System.Diagnostics.Debug.WriteLine(contact.Address.CityOrTown);
+                    System.Diagnostics.Debug.WriteLine(contact.Address.StateOrProvince);
+                    System.Diagnostics.Debug.WriteLine(contact.Address.PostalOrZipCode);
+                    System.Diagnostics.Debug.WriteLine(contact.Address.CountryCode);
+                    System.Diagnostics.Debug.WriteLine(String.Format("Is a validated address? {0}", contact.Address.IsValidated));
+                }
             }
 
             //Create a Customer Credit resource
@@ -86,7 +96,7 @@ namespace Mozu_BED_Training_Exercise_13_2
             //Create a Customer Account resource
             var customerAccountResource = new Mozu.Api.Resources.Commerce.Customer.CustomerAccountResource(_apiContext);
 
-            var existingAcct = customerAccountResource.GetAccountsAsync(filter: "EmailAddress eq 'jakelantern1@mozu.com'").Result;
+            var existingAcct = customerAccountResource.GetAccountsAsync(filter: "EmailAddress eq 'captainmal@serenitycorp.com'").Result;
 
             if (existingAcct == null || existingAcct.TotalCount == 0)
             {
@@ -108,7 +118,7 @@ namespace Mozu_BED_Training_Exercise_13_2
                         IsLocked = false,
                         UserName = "captainmal@serenitycorp.com",
                     },
-                    Password = "Password1!",
+                    Password = "Password1",
                     IsImport = true
                 };
 
@@ -180,7 +190,7 @@ namespace Mozu_BED_Training_Exercise_13_2
 
                 //Add additional contact
                 var newContactInara = contactResource.AddAccountContactAsync(contactInara, newAccount.CustomerAccount.Id).Result;
-
+            }
                 //Create a Customer Credit resource
                 var creditResource = new Mozu.Api.Resources.Commerce.Customer.CreditResource(_apiContext);
 
@@ -192,13 +202,13 @@ namespace Mozu_BED_Training_Exercise_13_2
                     CreditType = "GiftCard",
                     CurrencyCode = "USD",
                     CurrentBalance = 1000,
-                    CustomerId = newAccount.CustomerAccount.Id,
+                    CustomerId = 1002,
                     InitialBalance = 1000
                 };
 
                 //Add credit
                 var newCredit = creditResource.AddCreditAsync(credit).Result;
-            }
+            
         }
     }
 }
